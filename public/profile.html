@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kucingss - Profile</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #08080e;
+      --surface: rgba(255,255,255,0.04);
+      --surface-h: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.07);
+      --border-s: rgba(255,255,255,0.13);
+      --text: #f2f2f7;
+      --muted: rgba(242,242,247,0.45);
+      --dim: rgba(242,242,247,0.2);
+      --accent: #f59e0b;
+      --accent2: #d97706;
+      --accent-dim: rgba(245,158,11,0.12);
+      --pink: #ef4444;
+      --green: #22c55e;
+      --shadow: 0 12px 48px rgba(0,0,0,0.8);
+      --r: 18px; --r-sm: 11px;
+    }
+    [data-theme="light"] {
+      --bg: #f0eef8;
+      --surface: rgba(255,255,255,0.7);
+      --surface-h: rgba(255,255,255,0.9);
+      --border: rgba(0,0,0,0.07);
+      --border-s: rgba(0,0,0,0.13);
+      --text: #08080e;
+      --muted: rgba(8,8,14,0.5);
+      --dim: rgba(8,8,14,0.22);
+      --shadow: 0 12px 48px rgba(0,0,0,0.1);
+    }
+    html, body { min-height: 100vh; font-family: 'Geist', sans-serif; background: var(--bg); color: var(--text); transition: background 0.35s, color 0.35s; overflow-x: hidden; }
+    body::before {
+      content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: radial-gradient(ellipse 60% 50% at 20% 10%, rgba(245,158,11,0.08) 0%, transparent 60%);
+    }
+    [data-theme="light"] body::before { opacity: 0.5; }
+    .wrap { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 30px 18px 60px; display: flex; flex-direction: column; gap: 20px; }
+    
+    nav { display: flex; align-items: center; justify-content: space-between; animation: up 0.4s ease both; }
+    .brand { display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; color: var(--text); }
+    .brand-logo { width: 36px; height: 36px; border-radius: 10px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .brand-name { font-family: 'Geist Mono', monospace; font-size: 16px; font-weight: 600; letter-spacing: -0.02em; }
+    .brand-name em { font-style: normal; color: var(--accent); }
+    .nav-links { display: flex; gap: 12px; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 12px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--accent); }
+    .theme-btn { width: 42px; height: 25px; background: var(--surface); border: 1px solid var(--border-s); border-radius: 100px; cursor: pointer; position: relative; backdrop-filter: blur(12px); transition: background 0.3s; flex-shrink: 0; }
+    .theme-btn::after { content: ''; position: absolute; top: 3px; left: 3px; width: 17px; height: 17px; border-radius: 50%; background: var(--text); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+    [data-theme="light"] .theme-btn::after { transform: translateX(17px); }
+    
+    .user-avatar-nav { width: 32px; height: 32px; border-radius: 50%; background: var(--surface); border: 2px solid var(--border-s); cursor: pointer; object-fit: cover; }
+    
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); backdrop-filter: blur(28px) saturate(1.5); box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.055); overflow: hidden; animation: up 0.4s 0.13s ease both; }
+    [data-theme="light"] .card { box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.9); }
+    .card-inner { padding: 24px; }
+    .card-title { font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+    
+    .profile-header { display: flex; gap: 20px; align-items: center; margin-bottom: 20px; }
+    .profile-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); flex-shrink: 0; background: var(--surface); }
+    .profile-name { font-size: 22px; font-weight: 600; }
+    .profile-email { font-size: 13px; color: var(--muted); }
+    .profile-bio { margin-top: 8px; font-size: 14px; color: var(--muted); line-height: 1.6; }
+    
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.03em; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; background: var(--surface-h); border: 1px solid var(--border-s); border-radius: var(--r-sm); font-family: 'Geist', sans-serif; font-size: 13px; color: var(--text); outline: none; transition: border-color 0.2s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+    .form-group textarea { resize: vertical; min-height: 60px; }
+    
+    .btn { padding: 10px 24px; background: var(--accent); border: none; border-radius: var(--r-sm); cursor: pointer; font-family: 'Geist', sans-serif; font-size: 13px; font-weight: 600; color: #fff; transition: opacity 0.2s, transform 0.15s; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+    .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+    .btn-danger { background: var(--pink); }
+    .btn-outline { background: transparent; border: 1px solid var(--border-s); color: var(--text); }
+    .btn-outline:hover { background: var(--surface-h); }
+    
+    .social-link-item { display: flex; gap: 8px; align-items: center; padding: 8px 12px; background: var(--surface-h); border: 1px solid var(--border); border-radius: var(--r-sm); margin-bottom: 6px; }
+    .social-link-item .url { flex: 1; font-size: 13px; color: var(--text); }
+    .social-link-item .title { font-size: 12px; color: var(--muted); }
+    .social-link-item .remove-btn { background: none; border: none; color: var(--pink); cursor: pointer; font-size: 18px; }
+    
+    .cats-mini-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 8px; }
+    .cat-mini-card { background: var(--surface-h); border: 1px solid var(--border); border-radius: var(--r-sm); overflow: hidden; cursor: pointer; transition: transform 0.2s; }
+    .cat-mini-card:hover { transform: translateY(-2px); border-color: rgba(245,158,11,0.3); }
+    .cat-mini-card img { width: 100%; height: 100px; object-fit: cover; }
+    .cat-mini-card .info { padding: 8px 10px; }
+    .cat-mini-card .name { font-size: 12px; font-weight: 600; }
+    .cat-mini-card .price { font-size: 12px; color: var(--accent); font-weight: 500; }
+    
+    .empty-state { text-align: center; padding: 20px 0; color: var(--muted); font-size: 13px; }
+    .empty-state span { font-size: 30px; display: block; margin-bottom: 4px; }
+    
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--border-s); border-radius: var(--r-sm); padding: 12px 24px; backdrop-filter: blur(20px); font-size: 13px; color: var(--text); box-shadow: var(--shadow); opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none; z-index: 999; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: var(--green); }
+    .toast.error { border-color: var(--pink); }
+    
+    @keyframes up { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a href="/" class="brand">
+      <div class="brand-logo">🐱</div>
+      <div class="brand-name">Kucing<em>ss</em></div>
+    </a>
+    <div class="nav-links">
+      <a href="/">Beranda</a>
+      <a href="/profile.html" class="active">Profile</a>
+      <img class="user-avatar-nav" id="navAvatar" src="" alt="Avatar" style="display:none;"/>
+      <button class="theme-btn" id="themeBtn" type="button"></button>
+    </div>
+  </nav>
+
+  <!-- Profile Section -->
+  <div class="card" id="profileCard">
+    <div class="card-inner">
+      <div class="card-title">
+        <span>Profile Saya</span>
+        <button class="btn btn-outline" id="editProfileBtn" style="font-size:11px; padding:4px 12px;">Edit</button>
+      </div>
+      
+      <div id="profileView">
+        <div class="profile-header">
+          <img class="profile-avatar" id="profileAvatar" src="" alt="Avatar"/>
+          <div>
+            <div class="profile-name" id="profileName">-</div>
+            <div class="profile-email" id="profileEmail">-</div>
+            <div class="profile-bio" id="profileBio">-</div>
+          </div>
+        </div>
+        
+        <div style="margin-top:16px;">
+          <div style="font-size:12px; font-weight:500; color:var(--muted); text-transform:uppercase; letter-spacing:0.03em; margin-bottom:8px;">Social Links</div>
+          <div id="socialLinksContainer">
+            <div class="empty-state" style="padding:10px 0; font-size:12px;">
+              <span>🔗</span> Belum ada social link
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-top:16px;">
+          <div style="font-size:12px; font-weight:500; color:var(--muted); text-transform:uppercase; letter-spacing:0.03em; margin-bottom:8px;">Kucing Yang Dijual</div>
+          <div id="userCatsContainer">
+            <div class="empty-state" style="padding:10px 0; font-size:12px;">
+              <span>🐱</span> Belum menjual kucing
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="profileEdit" style="display:none;">
+        <form id="profileForm">
+          <div class="form-group">
+            <label>Foto Profil (URL)</label>
+            <input type="url" id="editAvatar" placeholder="https://..."/>
+          </div>
+          <div class="form-group">
+            <label>Nama</label>
+            <input type="text" id="editName" required/>
+          </div>
+          <div class="form-group">
+            <label>Bio</label>
+            <textarea id="editBio" rows="3" placeholder="Tentang kamu..."></textarea>
+          </div>
+          
+          <div style="font-size:12px; font-weight:500; color:var(--muted); text-transform:uppercase; letter-spacing:0.03em; margin:12px 0 8px;">Social Links</div>
+          <div id="editSocialLinks">
+            <!-- dynamic -->
+          </div>
+          <button type="button" class="btn btn-outline" id="addSocialBtn" style="font-size:11px; padding:4px 12px; margin-bottom:12px;">+ Tambah Link</button>
+          
+          <div style="display:flex; gap:8px;">
+            <button type="submit" class="btn">Simpan Profile</button>
+            <button type="button" class="btn btn-outline" id="cancelEditBtn">Batal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <footer style="text-align:center; font-family:'Geist Mono',monospace; font-size:10px; color:var(--dim); letter-spacing:0.08em; text-transform:uppercase; padding:10px 0;">
+    Kucingss &mdash; Jual Beli Kucing
+  </footer>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  // Theme
+  var html = document.documentElement;
+  html.setAttribute('data-theme', localStorage.getItem('kucingss-theme') || 'dark');
+  document.getElementById('themeBtn').addEventListener('click', function() {
+    var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('kucingss-theme', next);
+  });
+
+  function getUsers() {
+    return JSON.parse(localStorage.getItem('kucingss-users') || '[]');
+  }
+
+  function saveUsers(data) {
+    localStorage.setItem('kucingss-users', JSON.stringify(data));
+  }
+
+  function getCats() {
+    return JSON.parse(localStorage.getItem('kucingss-cats') || '[]');
+  }
+
+  function getCurrentUser() {
+    var user = JSON.parse(localStorage.getItem('kucingss-user') || 'null');
+    if (!user) return null;
+    var users = getUsers();
+    var found = users.find(u => u.email === user.email);
+    return found || user;
+  }
+
+  function setCurrentUser(user) {
+    localStorage.setItem('kucingss-user', JSON.stringify(user));
+  }
+
+  function showToast(msg, type) {
+    var toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.className = 'toast ' + type + ' show';
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(function() { toast.classList.remove('show'); }, 2500);
+  }
+
+  function escapeHtml(text) {
+    if (!text) return '';
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function renderProfile() {
+    var user = getCurrentUser();
+    if (!user) {
+      // Redirect to login
+      if (confirm('Harap login terlebih dahulu. Login dengan Google?')) {
+        var email = prompt('Masukkan email Google Anda:');
+        if (!email) { window.location.href = '/'; return; }
+        var name = prompt('Masukkan nama Anda:');
+        if (!name) { window.location.href = '/'; return; }
+        
+        var users = getUsers();
+        var existing = users.find(u => u.email === email);
+        if (existing) {
+          setCurrentUser(existing);
+          renderProfile();
+          return;
+        }
+        var newUser = {
+          email: email,
+          name: name,
+          avatar: '',
+          bio: 'Pecinta kucing',
+          socialLinks: []
+        };
+        users.push(newUser);
+        saveUsers(users);
+        setCurrentUser(newUser);
+        renderProfile();
+      } else {
+        window.location.href = '/';
+      }
+      return;
+    }
+
+    // Update nav avatar
+    var navAvatar = document.getElementById('navAvatar');
+    if (user.avatar) {
+      navAvatar.src = user.avatar;
+      navAvatar.style.display = 'block';
+    } else {
+      navAvatar.style.display = 'none';
+    }
+
+    // Profile view
+    document.getElementById('profileAvatar').src = user.avatar || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23' + (html.getAttribute('data-theme') === 'dark' ? '1a1a24' : 'e8e4f0') + '" width="100" height="100"/><text y="80" font-size="60" text-anchor="middle" x="50">🐱</text></svg>';
+    document.getElementById('profileName').textContent = user.name || '-';
+    document.getElementById('profileEmail').textContent = user.email || '-';
+    document.getElementById('profileBio').textContent = user.bio || '-';
+
+    // Social links
+    var socialContainer = document.getElementById('socialLinksContainer');
+    if (user.socialLinks && user.socialLinks.length > 0) {
+      var html = '';
+      user.socialLinks.forEach(function(link, index) {
+        html += '<div class="social-link-item">';
+        html += '<div class="url"><a href="' + escapeHtml(link.url) + '" target="_blank" style="color:var(--accent);text-decoration:none;">' + escapeHtml(link.url) + '</a></div>';
+        html += '<div class="title">' + escapeHtml(link.title) + '</div>';
+        html += '</div>';
+      });
+      socialContainer.innerHTML = html;
+    } else {
+      socialContainer.innerHTML = '<div class="empty-state" style="padding:10px 0; font-size:12px;"><span>🔗</span> Belum ada social link</div>';
+    }
+
+    // User's cats
+    var cats = getCats().filter(c => c.sellerEmail === user.email);
+    var userCatsContainer = document.getElementById('userCatsContainer');
+    if (cats.length > 0) {
+      var html = '<div class="cats-mini-grid">';
+      cats.forEach(function(cat) {
+        var img = cat.image || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect fill="%23' + (html.getAttribute('data-theme') === 'dark' ? '1a1a24' : 'e8e4f0') + '" width="200" height="200"/><text y="160" font-size="100" text-anchor="middle" x="100">🐱</text></svg>';
+        html += '<div class="cat-mini-card" onclick="location.href=\'/detail.html?id=' + cat.id + '\'">';
+        html += '<img src="' + img + '" alt="' + cat.name + '" onerror="this.src=\'data:image/svg+xml,<svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 200 200\\"><rect fill=\\'' + (html.getAttribute('data-theme') === 'dark' ? '1a1a24' : 'e8e4f0') + '\\' width=\\"200\\" height=\\"200\\"/><text y=\\"160\\" font-size=\\"100\\" text-anchor=\\"middle\\" x=\\"100\\">🐱</text></svg>\'"/>';
+        html += '<div class="info"><div class="name">' + escapeHtml(cat.name) + '</div><div class="price">Rp ' + Number(cat.price).toLocaleString('id-ID') + '</div></div>';
+        html += '</div>';
+      });
+      html += '</div>';
+      userCatsContainer.innerHTML = html;
+    } else {
+      userCatsContainer.innerHTML = '<div class="empty-state" style="padding:10px 0; font-size:12px;"><span>🐱</span> Belum menjual kucing</div>';
+    }
+
+    // Edit form
+    document.getElementById('editAvatar').value = user.avatar || '';
+    document.getElementById('editName').value = user.name || '';
+    document.getElementById('editBio').value = user.bio || '';
+
+    renderEditSocialLinks(user.socialLinks || []);
+  }
+
+  function renderEditSocialLinks(links) {
+    var container = document.getElementById('editSocialLinks');
+    if (!links || links.length === 0) {
+      container.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:8px 0;">Belum ada link</div>';
+      return;
+    }
+    var html = '';
+    links.forEach(function(link, index) {
+      html += '<div class="social-link-item">';
+      html += '<input type="text" class="social-url" value="' + escapeHtml(link.url) + '" placeholder="URL" style="flex:1;padding:6px 8px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:12px;"/>';
+      html += '<input type="text" class="social-title" value="' + escapeHtml(link.title) + '" placeholder="Judul" style="flex:0.5;padding:6px 8px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:12px;"/>';
+      html += '<button type="button" class="remove-social" data-index="' + index + '" style="background:none;border:none;color:var(--pink);cursor:pointer;font-size:18px;">&times;</button>';
+      html += '</div>';
+    });
+    container.innerHTML = html;
+
+    // Remove buttons
+    container.querySelectorAll('.remove-social').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(this.dataset.index);
+        var currentLinks = getSocialLinksFromForm();
+        currentLinks.splice(idx, 1);
+        renderEditSocialLinks(currentLinks);
+      });
+    });
+  }
+
+  function getSocialLinksFromForm() {
+    var links = [];
+    var containers = document.querySelectorAll('#editSocialLinks .social-link-item');
+    containers.forEach(function(item) {
+      var url = item.querySelector('.social-url').value.trim();
+      var title = item.querySelector('.social-title').value.trim();
+      if (url) {
+        links.push({ url: url, title: title || 'Link' });
+      }
+    });
+    return links;
+  }
+
+  // Edit profile toggle
+  document.getElementById('editProfileBtn').addEventListener('click', function() {
+    var user = getCurrentUser();
+    if (!user) {
+      showToast('Harap login terlebih dahulu', 'error');
+      return;
+    }
+    document.getElementById('profileView').style.display = 'none';
+    document.getElementById('profileEdit').style.display = 'block';
+    renderEditSocialLinks(user.socialLinks || []);
+  });
+
+  document.getElementById('cancelEditBtn').addEventListener('click', function() {
+    document.getElementById('profileView').style.display = 'block';
+    document.getElementById('profileEdit').style.display = 'none';
+    renderProfile();
+  });
+
+  // Add social link
+  document.getElementById('addSocialBtn').addEventListener('click', function() {
+    var currentLinks = getSocialLinksFromForm();
+    currentLinks.push({ url: '', title: '' });
+    renderEditSocialLinks(currentLinks);
+  });
+
+  // Save profile
+  document.getElementById('profileForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var user = getCurrentUser();
+    if (!user) {
+      showToast('Harap login terlebih dahulu', 'error');
+      return;
+    }
+
+    var avatar = document.getElementById('editAvatar').value.trim();
+    var name = document.getElementById('editName').value.trim();
+    var bio = document.getElementById('editBio').value.trim();
+    var socialLinks = getSocialLinksFromForm();
+
+    if (!name) {
+      showToast('Nama wajib diisi', 'error');
+      return;
+    }
+
+    var users = getUsers();
+    var userIndex = users.findIndex(u => u.email === user.email);
+    if (userIndex !== -1) {
+      users[userIndex].avatar = avatar;
+      users[userIndex].name = name;
+      users[userIndex].bio = bio || 'Pecinta kucing';
+      users[userIndex].socialLinks = socialLinks;
+      saveUsers(users);
+      setCurrentUser(users[userIndex]);
+    }
+
+    document.getElementById('profileView').style.display = 'block';
+    document.getElementById('profileEdit').style.display = 'none';
+    renderProfile();
+    showToast('Profile berhasil diperbarui!', 'success');
+  });
+
+  // Update nav avatar on storage change
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'kucingss-user' || e.key === 'kucingss-users') {
+      renderProfile();
+    }
+  });
+
+  // Init
+  renderProfile();
+})();
+</script>
+</body>
+</html>
