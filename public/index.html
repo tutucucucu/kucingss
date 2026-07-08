@@ -54,9 +54,12 @@
     .nav-links { display: flex; gap: 12px; align-items: center; }
     .nav-links a { color: var(--muted); text-decoration: none; font-size: 12px; font-weight: 500; transition: color 0.2s; }
     .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--accent); }
     .theme-btn { width: 42px; height: 25px; background: var(--surface); border: 1px solid var(--border-s); border-radius: 100px; cursor: pointer; position: relative; backdrop-filter: blur(12px); transition: background 0.3s; flex-shrink: 0; }
     .theme-btn::after { content: ''; position: absolute; top: 3px; left: 3px; width: 17px; height: 17px; border-radius: 50%; background: var(--text); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
     [data-theme="light"] .theme-btn::after { transform: translateX(17px); }
+    
+    .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--surface); border: 2px solid var(--border-s); cursor: pointer; object-fit: cover; }
     
     .hero { text-align: center; padding: 10px 0 4px; animation: up 0.4s 0.07s ease both; }
     .hero h1 { font-size: clamp(28px,8vw,50px); font-weight: 300; line-height: 1.08; letter-spacing: -0.04em; margin-bottom: 8px; }
@@ -67,38 +70,27 @@
     .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); backdrop-filter: blur(28px) saturate(1.5); box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.055); overflow: hidden; animation: up 0.4s 0.13s ease both; }
     [data-theme="light"] .card { box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.9); }
     .card-inner { padding: 20px; }
-    .card-title { font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
-    
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .form-group { display: flex; flex-direction: column; gap: 4px; }
-    .form-group.full { grid-column: 1 / -1; }
-    .form-group label { font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: 0.03em; text-transform: uppercase; }
-    .form-group input, .form-group select, .form-group textarea { padding: 10px 12px; background: var(--surface-h); border: 1px solid var(--border-s); border-radius: var(--r-sm); font-family: 'Geist', sans-serif; font-size: 13px; color: var(--text); outline: none; transition: border-color 0.2s; }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
-    .form-group textarea { resize: vertical; min-height: 60px; }
-    .form-group input::placeholder, .form-group textarea::placeholder { color: var(--dim); }
-    
-    .btn { padding: 10px 24px; background: var(--accent); border: none; border-radius: var(--r-sm); cursor: pointer; font-family: 'Geist', sans-serif; font-size: 13px; font-weight: 600; color: #fff; transition: opacity 0.2s, transform 0.15s; }
-    .btn:hover { opacity: 0.85; transform: translateY(-1px); }
-    .btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
-    .btn-danger { background: var(--pink); }
-    .btn-success { background: var(--green); }
-    
-    .divider { height: 1px; background: var(--border); margin: 12px 0; }
+    .card-title { font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
     
     .cats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-top: 4px; }
-    .cat-card { background: var(--surface-h); border: 1px solid var(--border); border-radius: var(--r-sm); overflow: hidden; transition: transform 0.2s, border-color 0.2s; }
+    .cat-card { background: var(--surface-h); border: 1px solid var(--border); border-radius: var(--r-sm); overflow: hidden; transition: transform 0.2s, border-color 0.2s; cursor: pointer; }
     .cat-card:hover { transform: translateY(-3px); border-color: rgba(245,158,11,0.3); }
-    .cat-image { width: 100%; height: 150px; object-fit: cover; background: var(--surface); }
+    .cat-image { width: 100%; height: 160px; object-fit: cover; background: var(--surface); }
     .cat-info { padding: 12px 14px; }
     .cat-name { font-size: 14px; font-weight: 600; }
     .cat-detail { font-size: 12px; color: var(--muted); margin-top: 2px; }
     .cat-price { font-size: 15px; font-weight: 600; color: var(--accent); margin-top: 4px; }
-    .cat-actions { display: flex; gap: 6px; margin-top: 8px; }
-    .cat-actions .btn { padding: 4px 12px; font-size: 11px; }
+    .cat-seller { font-size: 11px; color: var(--dim); margin-top: 6px; display: flex; align-items: center; gap: 6px; }
+    .cat-seller img { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; }
     
     .empty-state { text-align: center; padding: 30px 0; color: var(--muted); font-size: 13px; }
     .empty-state span { font-size: 40px; display: block; margin-bottom: 8px; }
+    
+    .btn { padding: 10px 24px; background: var(--accent); border: none; border-radius: var(--r-sm); cursor: pointer; font-family: 'Geist', sans-serif; font-size: 13px; font-weight: 600; color: #fff; transition: opacity 0.2s, transform 0.15s; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+    .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+    .btn-outline { background: transparent; border: 1px solid var(--border-s); color: var(--text); }
+    .btn-outline:hover { background: var(--surface-h); }
     
     .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--border-s); border-radius: var(--r-sm); padding: 12px 24px; backdrop-filter: blur(20px); font-size: 13px; color: var(--text); box-shadow: var(--shadow); opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none; z-index: 999; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -106,6 +98,19 @@
     .toast.error { border-color: var(--pink); }
     
     @keyframes up { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+    
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--bg); border: 1px solid var(--border); border-radius: var(--r); max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 28px; box-shadow: var(--shadow); }
+    .modal-title { font-size: 20px; font-weight: 600; margin-bottom: 16px; }
+    .modal-close { float: right; background: none; border: none; color: var(--muted); font-size: 24px; cursor: pointer; }
+    .modal-close:hover { color: var(--text); }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.03em; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; background: var(--surface-h); border: 1px solid var(--border-s); border-radius: var(--r-sm); font-family: 'Geist', sans-serif; font-size: 13px; color: var(--text); outline: none; transition: border-color 0.2s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+    .form-group textarea { resize: vertical; min-height: 60px; }
   </style>
 </head>
 <body>
@@ -117,7 +122,9 @@
       <div class="brand-name">Kucing<em>ss</em></div>
     </a>
     <div class="nav-links">
-      <a href="/">Beranda</a>
+      <a href="/" class="active">Beranda</a>
+      <a href="/profile.html">Profile</a>
+      <img class="user-avatar" id="navAvatar" src="" alt="Avatar" style="display:none;" onclick="location.href='/profile.html'"/>
       <button class="theme-btn" id="themeBtn" type="button"></button>
     </div>
   </nav>
@@ -127,55 +134,21 @@
     <p>Temukan kucing kesayanganmu atau jual kucingmu di sini.</p>
   </div>
 
-  <!-- Form Tambah Kucing -->
-  <div class="card">
-    <div class="card-inner">
-      <div class="card-title">Tambah Kucing</div>
-      <form id="catForm" class="form-grid">
-        <div class="form-group">
-          <label>Nama Kucing</label>
-          <input type="text" id="catName" placeholder="Mis: Milo" required/>
-        </div>
-        <div class="form-group">
-          <label>Harga (Rp)</label>
-          <input type="number" id="catPrice" placeholder="1000000" required/>
-        </div>
-        <div class="form-group">
-          <label>Ras</label>
-          <input type="text" id="catBreed" placeholder="Mis: Persia"/>
-        </div>
-        <div class="form-group">
-          <label>Umur</label>
-          <input type="text" id="catAge" placeholder="Mis: 3 bulan"/>
-        </div>
-        <div class="form-group full">
-          <label>URL Gambar</label>
-          <input type="url" id="catImage" placeholder="https://... (opsional)"/>
-        </div>
-        <div class="form-group full">
-          <label>Deskripsi</label>
-          <textarea id="catDesc" placeholder="Deskripsi singkat tentang kucing..."></textarea>
-        </div>
-        <div class="form-group full" style="display:flex; gap:8px; margin-top:4px;">
-          <button type="submit" class="btn" id="submitBtn">Tambah Kucing</button>
-          <button type="reset" class="btn" style="background:var(--muted);">Reset</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <!-- Daftar Kucing -->
   <div class="card">
     <div class="card-inner">
-      <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
-        <span>Daftar Kucing</span>
+      <div class="card-title">
+        <span>Kucing Yang Dijual</span>
         <span id="catCount" style="font-weight:400; font-size:11px; color:var(--muted);">0</span>
       </div>
       <div id="catsContainer">
         <div class="empty-state">
           <span>🐾</span>
-          Belum ada kucing. Tambahkan sekarang!
+          Belum ada kucing yang dijual.
         </div>
+      </div>
+      <div style="margin-top:16px; text-align:center;">
+        <button class="btn" id="addCatBtn">+ Tambah Kucing</button>
       </div>
     </div>
   </div>
@@ -183,6 +156,41 @@
   <footer style="text-align:center; font-family:'Geist Mono',monospace; font-size:10px; color:var(--dim); letter-spacing:0.08em; text-transform:uppercase; padding:10px 0;">
     Kucingss &mdash; Jual Beli Kucing
   </footer>
+</div>
+
+<!-- Modal Tambah Kucing -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">&times;</button>
+    <div class="modal-title">Tambah Kucing</div>
+    <form id="catForm">
+      <div class="form-group">
+        <label>Nama Kucing *</label>
+        <input type="text" id="catName" placeholder="Mis: Milo" required/>
+      </div>
+      <div class="form-group">
+        <label>Harga (Rp) *</label>
+        <input type="number" id="catPrice" placeholder="1000000" required/>
+      </div>
+      <div class="form-group">
+        <label>Ras</label>
+        <input type="text" id="catBreed" placeholder="Mis: Persia"/>
+      </div>
+      <div class="form-group">
+        <label>Umur</label>
+        <input type="text" id="catAge" placeholder="Mis: 3 bulan"/>
+      </div>
+      <div class="form-group">
+        <label>URL Gambar</label>
+        <input type="url" id="catImage" placeholder="https://... (opsional)"/>
+      </div>
+      <div class="form-group">
+        <label>Deskripsi</label>
+        <textarea id="catDesc" placeholder="Deskripsi singkat tentang kucing..."></textarea>
+      </div>
+      <button type="submit" class="btn" style="width:100%;">Jual Kucing</button>
+    </form>
+  </div>
 </div>
 
 <!-- Toast -->
@@ -199,31 +207,115 @@
     localStorage.setItem('kucingss-theme', next);
   });
 
-  // Data
-  var cats = JSON.parse(localStorage.getItem('kucingss-cats') || '[]');
-  var container = document.getElementById('catsContainer');
-  var catCount = document.getElementById('catCount');
+  // Auth
+  var currentUser = JSON.parse(localStorage.getItem('kucingss-user') || 'null');
+  var users = JSON.parse(localStorage.getItem('kucingss-users') || '[]');
 
+  function getUsers() {
+    return JSON.parse(localStorage.getItem('kucingss-users') || '[]');
+  }
+
+  function saveUsers(data) {
+    localStorage.setItem('kucingss-users', JSON.stringify(data));
+  }
+
+  function getCats() {
+    return JSON.parse(localStorage.getItem('kucingss-cats') || '[]');
+  }
+
+  function saveCats(data) {
+    localStorage.setItem('kucingss-cats', JSON.stringify(data));
+  }
+
+  function getCurrentUser() {
+    var user = JSON.parse(localStorage.getItem('kucingss-user') || 'null');
+    if (!user) return null;
+    var usersData = getUsers();
+    var found = usersData.find(u => u.email === user.email);
+    return found || user;
+  }
+
+  function setCurrentUser(user) {
+    localStorage.setItem('kucingss-user', JSON.stringify(user));
+    updateNav();
+  }
+
+  function updateNav() {
+    var avatar = document.getElementById('navAvatar');
+    var user = getCurrentUser();
+    if (user && user.avatar) {
+      avatar.src = user.avatar;
+      avatar.style.display = 'block';
+    } else if (user) {
+      avatar.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23' + (html.getAttribute('data-theme') === 'dark' ? '1a1a24' : 'e8e4f0') + '" width="100" height="100"/><text y="80" font-size="60" text-anchor="middle" x="50">🐱</text></svg>';
+      avatar.style.display = 'block';
+    } else {
+      avatar.style.display = 'none';
+    }
+  }
+
+  // Google Sign In (simulated)
+  function signInWithGoogle() {
+    var usersData = getUsers();
+    var email = prompt('Masukkan email Google Anda:');
+    if (!email) return null;
+    
+    var name = prompt('Masukkan nama Anda:');
+    if (!name) return null;
+    
+    var existing = usersData.find(u => u.email === email);
+    if (existing) {
+      setCurrentUser(existing);
+      showToast('Selamat datang kembali, ' + existing.name + '!', 'success');
+      return existing;
+    }
+    
+    var newUser = {
+      email: email,
+      name: name,
+      avatar: '',
+      bio: 'Pecinta kucing',
+      socialLinks: []
+    };
+    usersData.push(newUser);
+    saveUsers(usersData);
+    setCurrentUser(newUser);
+    showToast('Akun berhasil dibuat!', 'success');
+    return newUser;
+  }
+
+  // Render cats
   function renderCats() {
+    var cats = getCats();
+    var container = document.getElementById('catsContainer');
+    var catCount = document.getElementById('catCount');
+    var usersData = getUsers();
+
     if (cats.length === 0) {
-      container.innerHTML = '<div class="empty-state"><span>🐾</span>Belum ada kucing. Tambahkan sekarang!</div>';
+      container.innerHTML = '<div class="empty-state"><span>🐾</span>Belum ada kucing yang dijual.</div>';
       catCount.textContent = '0';
       return;
     }
+
     var html = '<div class="cats-grid">';
-    cats.forEach(function(cat, index) {
+    cats.forEach(function(cat) {
+      var seller = usersData.find(u => u.email === cat.sellerEmail);
+      var sellerName = seller ? seller.name : 'Unknown';
+      var sellerAvatar = seller && seller.avatar ? seller.avatar : '';
+      
       var image = cat.image || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect fill="%23' + (html.getAttribute('data-theme') === 'dark' ? '1a1a24' : 'e8e4f0') + '" width="200" height="200"/><text y="160" font-size="100" text-anchor="middle" x="100">🐱</text></svg>';
-      html += '<div class="cat-card">';
+      
+      html += '<div class="cat-card" onclick="location.href=\'/detail.html?id=' + cat.id + '\'">';
       html += '<img class="cat-image" src="' + image + '" alt="' + cat.name + '" onerror="this.src=\'data:image/svg+xml,<svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 200 200\\"><rect fill=\\'' + (html.getAttribute('data-theme') === 'dark' ? '1a1a24' : 'e8e4f0') + '\\' width=\\"200\\" height=\\"200\\"/><text y=\\"160\\" font-size=\\"100\\" text-anchor=\\"middle\\" x=\\"100\\">🐱</text></svg>\'"/>';
       html += '<div class="cat-info">';
       html += '<div class="cat-name">' + escapeHtml(cat.name) + '</div>';
-      if (cat.breed) html += '<div class="cat-detail">Ras: ' + escapeHtml(cat.breed) + '</div>';
+      if (cat.breed) html += '<div class="cat-detail">' + escapeHtml(cat.breed) + '</div>';
       if (cat.age) html += '<div class="cat-detail">Umur: ' + escapeHtml(cat.age) + '</div>';
       html += '<div class="cat-price">Rp ' + Number(cat.price).toLocaleString('id-ID') + '</div>';
-      if (cat.desc) html += '<div class="cat-detail" style="margin-top:4px;font-size:11px;">' + escapeHtml(cat.desc) + '</div>';
-      html += '<div class="cat-actions">';
-      html += '<button class="btn btn-danger" onclick="deleteCat(' + index + ')">Hapus</button>';
-      html += '</div></div></div>';
+      html += '<div class="cat-seller">';
+      if (sellerAvatar) html += '<img src="' + sellerAvatar + '" alt=""/>';
+      html += escapeHtml(sellerName) + '</div>';
+      html += '</div></div>';
     });
     html += '</div>';
     container.innerHTML = html;
@@ -231,19 +323,11 @@
   }
 
   function escapeHtml(text) {
+    if (!text) return '';
     var div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
   }
-
-  window.deleteCat = function(index) {
-    if (confirm('Hapus kucing ini?')) {
-      cats.splice(index, 1);
-      localStorage.setItem('kucingss-cats', JSON.stringify(cats));
-      renderCats();
-      showToast('Kucing berhasil dihapus', 'success');
-    }
-  };
 
   function showToast(msg, type) {
     var toast = document.getElementById('toast');
@@ -253,9 +337,45 @@
     toast._timer = setTimeout(function() { toast.classList.remove('show'); }, 2500);
   }
 
-  // Form submit
+  // Add cat button
+  document.getElementById('addCatBtn').addEventListener('click', function() {
+    var user = getCurrentUser();
+    if (!user) {
+      var confirmed = confirm('Anda harus login dulu. Login dengan Google?');
+      if (confirmed) {
+        signInWithGoogle();
+        // Cek lagi setelah sign in
+        setTimeout(function() {
+          var userNow = getCurrentUser();
+          if (userNow) {
+            document.getElementById('addModal').classList.add('show');
+          }
+        }, 500);
+      }
+      return;
+    }
+    document.getElementById('addModal').classList.add('show');
+  });
+
+  document.getElementById('modalClose').addEventListener('click', function() {
+    document.getElementById('addModal').classList.remove('show');
+  });
+
+  document.getElementById('addModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      this.classList.remove('show');
+    }
+  });
+
+  // Submit cat form
   document.getElementById('catForm').addEventListener('submit', function(e) {
     e.preventDefault();
+    var user = getCurrentUser();
+    if (!user) {
+      showToast('Harap login terlebih dahulu', 'error');
+      return;
+    }
+
     var name = document.getElementById('catName').value.trim();
     var price = parseInt(document.getElementById('catPrice').value);
     var breed = document.getElementById('catBreed').value.trim();
@@ -266,14 +386,38 @@
     if (!name) { showToast('Nama kucing wajib diisi', 'error'); return; }
     if (!price || price <= 0) { showToast('Harga harus diisi dengan angka valid', 'error'); return; }
 
-    cats.push({ name, price, breed, age, image, desc });
-    localStorage.setItem('kucingss-cats', JSON.stringify(cats));
+    var cats = getCats();
+    var newCat = {
+      id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+      name: name,
+      price: price,
+      breed: breed,
+      age: age,
+      image: image,
+      desc: desc,
+      sellerEmail: user.email,
+      createdAt: new Date().toISOString()
+    };
+    cats.push(newCat);
+    saveCats(cats);
     renderCats();
     this.reset();
+    document.getElementById('addModal').classList.remove('show');
     showToast('Kucing berhasil ditambahkan!', 'success');
   });
 
+  // Init
+  updateNav();
   renderCats();
+
+  // Check if user just signed in from profile
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'kucingss-user' || e.key === 'kucingss-users') {
+      updateNav();
+      renderCats();
+    }
+  });
+
 })();
 </script>
 </body>
