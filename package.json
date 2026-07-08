@@ -1,0 +1,19 @@
+{
+  "name": "kucingss",
+  "version": "1.0.0",
+  "description": "Platform jual beli kucing online",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["kucing", "jual", "beli", "hewan", "pets"],
+  "author": "Kucingss",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
