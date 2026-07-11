@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Masuk / Daftar — Kucingss</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--cream:#faf7f2;--cream2:#f3ede4;--orange:#e8621a;--brown:#2d1a0e;--muted:rgba(45,26,14,.55);--border:rgba(45,26,14,.1);--border-s:rgba(45,26,14,.2);--r:14px}
+    body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--brown);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+    .brand{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;text-decoration:none;color:var(--brown);margin-bottom:32px;display:block;text-align:center}
+    .card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:32px;width:100%;max-width:400px;box-shadow:0 8px 40px rgba(45,26,14,.08)}
+    .tabs{display:flex;gap:0;margin-bottom:28px;background:var(--cream2);border-radius:100px;padding:4px}
+    .tab{flex:1;padding:9px;border:none;background:transparent;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .2s}
+    .tab.active{background:#fff;color:var(--brown);font-weight:600;box-shadow:0 2px 8px rgba(45,26,14,.1)}
+    .form-group{margin-bottom:16px}
+    label{display:block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+    input{width:100%;padding:12px 14px;border:1.5px solid var(--border-s);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--brown);background:#fff;outline:none;transition:border-color .2s}
+    input:focus{border-color:var(--orange)}
+    .btn{width:100%;padding:13px;border:none;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;background:var(--orange);color:#fff;transition:opacity .2s,transform .15s;margin-top:8px}
+    .btn:hover{opacity:.85;transform:translateY(-1px)}
+    .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .err{padding:10px 14px;background:rgba(232,98,26,.08);border:1px solid rgba(232,98,26,.2);border-radius:var(--r);font-size:13px;color:var(--orange);margin-bottom:14px;display:none}
+    .err.show{display:block}
+    .back{display:block;text-align:center;margin-top:20px;font-size:13px;color:var(--muted);text-decoration:none}
+    .back:hover{color:var(--orange)}
+  </style>
+</head>
+<body>
+<a class="brand" href="/">🐱 Kucingss</a>
+<div class="card">
+  <div class="tabs">
+    <button class="tab active" id="tabLogin" type="button">Masuk</button>
+    <button class="tab" id="tabSignup" type="button">Daftar</button>
+  </div>
+
+  <div class="err" id="errMsg"></div>
+
+  <div id="formLogin">
+    <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="email@kamu.com" autocomplete="email"/></div>
+    <div class="form-group"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"/></div>
+    <button class="btn" id="loginBtn" type="button">Masuk</button>
+  </div>
+
+  <div id="formSignup" style="display:none">
+    <div class="form-group"><label>Nama</label><input type="text" id="signupName" placeholder="Nama kamu" autocomplete="name"/></div>
+    <div class="form-group"><label>Email</label><input type="email" id="signupEmail" placeholder="email@kamu.com" autocomplete="email"/></div>
+    <div class="form-group"><label>Password</label><input type="password" id="signupPass" placeholder="Min. 6 karakter" autocomplete="new-password"/></div>
+    <button class="btn" id="signupBtn" type="button">Daftar Sekarang</button>
+  </div>
+</div>
+<a class="back" href="/">← Kembali ke beranda</a>
+
+<script>
+(function(){
+  if(localStorage.getItem('kc_token')) { location.href='/'; return; }
+
+  var tabs = { login: document.getElementById('tabLogin'), signup: document.getElementById('tabSignup') };
+  var forms = { login: document.getElementById('formLogin'), signup: document.getElementById('formSignup') };
+  var err = document.getElementById('errMsg');
+
+  function showErr(msg){ err.textContent=msg; err.classList.add('show'); }
+  function hideErr(){ err.classList.remove('show'); }
+
+  function switchTab(t){
+    Object.keys(tabs).forEach(function(k){
+      tabs[k].classList.toggle('active', k===t);
+      forms[k].style.display = k===t ? 'block' : 'none';
+    });
+    hideErr();
+  }
+
+  tabs.login.addEventListener('click', function(){ switchTab('login'); });
+  tabs.signup.addEventListener('click', function(){ switchTab('signup'); });
+
+  function saveAndRedirect(data){
+    localStorage.setItem('kc_token', data.token);
+    localStorage.setItem('kc_user', JSON.stringify(data.user));
+    location.href = '/';
+  }
+
+  document.getElementById('loginBtn').addEventListener('click', function(){
+    hideErr();
+    var email = document.getElementById('loginEmail').value.trim();
+    var password = document.getElementById('loginPass').value;
+    if(!email||!password){ showErr('Isi semua field'); return; }
+    this.disabled=true; this.textContent='Memuat...';
+    var btn=this;
+    fetch('/api/login',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email,password}) })
+      .then(function(r){ return r.json(); })
+      .then(function(d){ if(d.error){ showErr(d.error); btn.disabled=false; btn.textContent='Masuk'; } else { saveAndRedirect(d); } })
+      .catch(function(){ showErr('Terjadi kesalahan'); btn.disabled=false; btn.textContent='Masuk'; });
+  });
+
+  document.getElementById('signupBtn').addEventListener('click', function(){
+    hideErr();
+    var name=document.getElementById('signupName').value.trim();
+    var email=document.getElementById('signupEmail').value.trim();
+    var password=document.getElementById('signupPass').value;
+    if(!name||!email||!password){ showErr('Isi semua field'); return; }
+    if(password.length<6){ showErr('Password minimal 6 karakter'); return; }
+    this.disabled=true; this.textContent='Mendaftar...';
+    var btn=this;
+    fetch('/api/signup',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name,email,password}) })
+      .then(function(r){ return r.json(); })
+      .then(function(d){ if(d.error){ showErr(d.error); btn.disabled=false; btn.textContent='Daftar Sekarang'; } else { saveAndRedirect(d); } })
+      .catch(function(){ showErr('Terjadi kesalahan'); btn.disabled=false; btn.textContent='Daftar Sekarang'; });
+  });
+
+  [document.getElementById('loginPass'), document.getElementById('signupPass'), document.getElementById('loginEmail'), document.getElementById('signupEmail'), document.getElementById('signupName')].forEach(function(el){
+    el.addEventListener('keydown', function(e){ if(e.key==='Enter'){ var active=document.querySelector('.tab.active').id==='tabLogin'?document.getElementById('loginBtn'):document.getElementById('signupBtn'); active.click(); } });
+  });
+})();
+</script>
+</body>
+</html>
