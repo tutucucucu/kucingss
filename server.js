@@ -1,206 +1,123 @@
-const express = require('express');
-const path = require('path');
-const fs = require('fs');
+const express = require("express");
+const path = require("path");
+const fs = require("fs");
+const low = require("lowdb");
+const FileSync = require("lowdb/adapters/FileSync");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const { v4: uuidv4 } = require("uuid");
+const multer = require("multer");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+app.use(express.json({ limit: "5mb" }));
+app.use(express.static(path.join(__dirname, "public")));
 
-// Middleware
-app.use(express.json());
-app.use(express.static('public'));
+const JWT_SECRET = process.env.JWT_SECRET || "kucingss_secret_2025";
+const DB_PATH = process.env.NODE_ENV === "production" ? "/tmp/db.json" : path.join(__dirname, "db.json");
 
-// File database path
-const DB_PATH = path.join(__dirname, 'db.json');
-
-// Initialize database
-function initDB() {
-  if (!fs.existsSync(DB_PATH)) {
-    fs.writeFileSync(DB_PATH, JSON.stringify({
-      users: [],
-      cats: []
-    }, null, 2));
-  }
+if (!fs.existsSync(DB_PATH)) {
+  fs.writeFileSync(DB_PATH, JSON.stringify({ users: [], cats: [] }));
 }
 
-function readDB() {
+const adapter = new FileSync(DB_PATH);
+const db = low(adapter);
+db.defaults({ users: [], cats: [] }).write();
+
+function auth(req, res, next) {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
   try {
-    const data = fs.readFileSync(DB_PATH, 'utf8');
-    return JSON.parse(data);
-  } catch (e) {
-    return { users: [], cats: [] };
+    req.user = jwt.verify(token, JWT_SECRET);
+    next();
+  } catch {
+    res.status(401).json({ error: "Invalid token" });
   }
 }
 
-function writeDB(data) {
-  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
-}
-
-initDB();
-
-// API Routes
-app.get('/api/cats', (req, res) => {
-  const db = readDB();
-  res.json(db.cats);
+// AUTH
+app.post("/api/signup", async (req, res) => {
+  const { name, email, password } = req.body;
+  if (!name || !email || !password) return res.status(400).json({ error: "Semua field wajib diisi" });
+  if (db.get("users").find({ email }).value()) return res.status(400).json({ error: "Email sudah terdaftar" });
+  const hash = await bcrypt.hash(password, 10);
+  const user = { id: uuidv4(), name, email, password: hash, bio: "", wa: "", link: "", linkTitle: "", avatar: "", createdAt: Date.now() };
+  db.get("users").push(user).write();
+  const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: "30d" });
+  res.json({ token, user: { id: user.id, name: user.name, email: user.email, bio: user.bio, wa: user.wa, link: user.link, linkTitle: user.linkTitle, avatar: user.avatar } });
 });
 
-app.get('/api/cats/:id', (req, res) => {
-  const db = readDB();
-  const cat = db.cats.find(c => c.id === req.params.id);
-  if (!cat) {
-    return res.status(404).json({ error: 'Kucing tidak ditemukan' });
-  }
+app.post("/api/login", async (req, res) => {
+  const { email, password } = req.body;
+  const user = db.get("users").find({ email }).value();
+  if (!user) return res.status(400).json({ error: "Email tidak ditemukan" });
+  const ok = await bcrypt.compare(password, user.password);
+  if (!ok) return res.status(400).json({ error: "Password salah" });
+  const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: "30d" });
+  res.json({ token, user: { id: user.id, name: user.name, email: user.email, bio: user.bio, wa: user.wa, link: user.link, linkTitle: user.linkTitle, avatar: user.avatar } });
+});
+
+app.get("/api/me", auth, (req, res) => {
+  const user = db.get("users").find({ id: req.user.id }).value();
+  if (!user) return res.status(404).json({ error: "User not found" });
+  res.json({ id: user.id, name: user.name, email: user.email, bio: user.bio, wa: user.wa, link: user.link, linkTitle: user.linkTitle, avatar: user.avatar });
+});
+
+app.put("/api/me", auth, (req, res) => {
+  const { name, bio, wa, link, linkTitle, avatar } = req.body;
+  db.get("users").find({ id: req.user.id }).assign({ name, bio, wa, link, linkTitle, avatar }).write();
+  const user = db.get("users").find({ id: req.user.id }).value();
+  res.json({ id: user.id, name: user.name, email: user.email, bio: user.bio, wa: user.wa, link: user.link, linkTitle: user.linkTitle, avatar: user.avatar });
+});
+
+// CATS
+app.get("/api/cats", (req, res) => {
+  const cats = db.get("cats").filter({ deleted: false }).value();
+  const users = db.get("users").value();
+  const result = cats.map(function(c) {
+    const u = users.find(function(u) { return u.id === c.userId; });
+    return Object.assign({}, c, { seller: u ? { id: u.id, name: u.name, avatar: u.avatar, wa: u.wa } : null });
+  });
+  res.json(result.reverse());
+});
+
+app.get("/api/cats/:id", (req, res) => {
+  const cat = db.get("cats").find({ id: req.params.id, deleted: false }).value();
+  if (!cat) return res.status(404).json({ error: "Not found" });
+  const u = db.get("users").find({ id: cat.userId }).value();
+  res.json(Object.assign({}, cat, { seller: u ? { id: u.id, name: u.name, avatar: u.avatar, wa: u.wa } : null }));
+});
+
+app.post("/api/cats", auth, (req, res) => {
+  const { name, price, description, image } = req.body;
+  if (!name || !price || !description) return res.status(400).json({ error: "Nama, harga, dan deskripsi wajib diisi" });
+  const cat = { id: uuidv4(), userId: req.user.id, name, price: parseInt(price), description, image: image || "", deleted: false, createdAt: Date.now() };
+  db.get("cats").push(cat).write();
   res.json(cat);
 });
 
-app.post('/api/cats', (req, res) => {
-  const { name, price, breed, age, image, desc, sellerEmail } = req.body;
-  
-  if (!name || !price || !sellerEmail) {
-    return res.status(400).json({ error: 'Nama, harga, dan email penjual wajib diisi' });
-  }
-
-  const db = readDB();
-  const newCat = {
-    id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
-    name: name.trim(),
-    price: Number(price),
-    breed: breed || '',
-    age: age || '',
-    image: image || '',
-    desc: desc || '',
-    sellerEmail: sellerEmail,
-    createdAt: new Date().toISOString()
-  };
-
-  db.cats.push(newCat);
-  writeDB(db);
-  res.status(201).json(newCat);
+app.put("/api/cats/:id", auth, (req, res) => {
+  const cat = db.get("cats").find({ id: req.params.id }).value();
+  if (!cat) return res.status(404).json({ error: "Not found" });
+  if (cat.userId !== req.user.id) return res.status(403).json({ error: "Forbidden" });
+  const { name, price, description, image } = req.body;
+  db.get("cats").find({ id: req.params.id }).assign({ name, price: parseInt(price), description, image }).write();
+  res.json(db.get("cats").find({ id: req.params.id }).value());
 });
 
-app.put('/api/cats/:id', (req, res) => {
-  const { name, price, breed, age, image, desc } = req.body;
-  const db = readDB();
-  const index = db.cats.findIndex(c => c.id === req.params.id);
-
-  if (index === -1) {
-    return res.status(404).json({ error: 'Kucing tidak ditemukan' });
-  }
-
-  if (name) db.cats[index].name = name.trim();
-  if (price) db.cats[index].price = Number(price);
-  if (breed !== undefined) db.cats[index].breed = breed;
-  if (age !== undefined) db.cats[index].age = age;
-  if (image !== undefined) db.cats[index].image = image;
-  if (desc !== undefined) db.cats[index].desc = desc;
-
-  writeDB(db);
-  res.json(db.cats[index]);
+app.delete("/api/cats/:id", auth, (req, res) => {
+  const cat = db.get("cats").find({ id: req.params.id }).value();
+  if (!cat) return res.status(404).json({ error: "Not found" });
+  if (cat.userId !== req.user.id) return res.status(403).json({ error: "Forbidden" });
+  db.get("cats").find({ id: req.params.id }).assign({ deleted: true }).write();
+  res.json({ ok: true });
 });
 
-app.delete('/api/cats/:id', (req, res) => {
-  const db = readDB();
-  const index = db.cats.findIndex(c => c.id === req.params.id);
+// PAGES
+app.get("/signup", (req, res) => res.sendFile(path.join(__dirname, "public", "signup.html")));
+app.get("/new", (req, res) => res.sendFile(path.join(__dirname, "public", "new.html")));
+app.get("/profile", (req, res) => res.sendFile(path.join(__dirname, "public", "profile.html")));
+app.get("*", (req, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
 
-  if (index === -1) {
-    return res.status(404).json({ error: 'Kucing tidak ditemukan' });
-  }
-
-  db.cats.splice(index, 1);
-  writeDB(db);
-  res.json({ message: 'Kucing berhasil dihapus' });
-});
-
-// Users
-app.get('/api/users', (req, res) => {
-  const db = readDB();
-  // Remove sensitive data
-  const users = db.users.map(u => ({
-    email: u.email,
-    name: u.name,
-    avatar: u.avatar,
-    bio: u.bio,
-    socialLinks: u.socialLinks || []
-  }));
-  res.json(users);
-});
-
-app.get('/api/users/:email', (req, res) => {
-  const db = readDB();
-  const user = db.users.find(u => u.email === req.params.email);
-  if (!user) {
-    return res.status(404).json({ error: 'User tidak ditemukan' });
-  }
-  res.json({
-    email: user.email,
-    name: user.name,
-    avatar: user.avatar,
-    bio: user.bio,
-    socialLinks: user.socialLinks || []
-  });
-});
-
-app.post('/api/users', (req, res) => {
-  const { email, name, avatar, bio, socialLinks } = req.body;
-
-  if (!email || !name) {
-    return res.status(400).json({ error: 'Email dan nama wajib diisi' });
-  }
-
-  const db = readDB();
-  const existing = db.users.find(u => u.email === email);
-
-  if (existing) {
-    return res.status(400).json({ error: 'Email sudah terdaftar' });
-  }
-
-  const newUser = {
-    email: email,
-    name: name.trim(),
-    avatar: avatar || '',
-    bio: bio || 'Pecinta kucing',
-    socialLinks: socialLinks || []
-  };
-
-  db.users.push(newUser);
-  writeDB(db);
-  res.status(201).json(newUser);
-});
-
-app.put('/api/users/:email', (req, res) => {
-  const { name, avatar, bio, socialLinks } = req.body;
-  const db = readDB();
-  const index = db.users.findIndex(u => u.email === req.params.email);
-
-  if (index === -1) {
-    return res.status(404).json({ error: 'User tidak ditemukan' });
-  }
-
-  if (name) db.users[index].name = name.trim();
-  if (avatar !== undefined) db.users[index].avatar = avatar;
-  if (bio !== undefined) db.users[index].bio = bio;
-  if (socialLinks !== undefined) db.users[index].socialLinks = socialLinks;
-
-  writeDB(db);
-  res.json({
-    email: db.users[index].email,
-    name: db.users[index].name,
-    avatar: db.users[index].avatar,
-    bio: db.users[index].bio,
-    socialLinks: db.users[index].socialLinks || []
-  });
-});
-
-app.get('/api/users/:email/cats', (req, res) => {
-  const db = readDB();
-  const cats = db.cats.filter(c => c.sellerEmail === req.params.email);
-  res.json(cats);
-});
-
-// Serve index.html for all other routes (SPA)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-app.listen(PORT, () => {
-  console.log(`Server berjalan di http://localhost:${PORT}`);
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log("Kucingss on port " + PORT));
+module.exports = app;
